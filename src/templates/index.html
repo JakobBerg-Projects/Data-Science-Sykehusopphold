@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hospital Stay Prediction</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+      }
+      .container {
+        width: 50%;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      label {
+        font-weight: bold;
+      }
+      input, select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Predict Hospital Stay Length</h1>
+
+      <form action="{{url_for('predict')}}" method="post">
+
+        <!-- Numeric Fields -->
+        <label for="alder">Age:</label>
+        <input type="number" id="alder" name="alder" placeholder="Enter age" required>
+
+        <label for="kjonn">Gender:</label>
+        <select id="kjonn" name="kjonn" required>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+
+        <label for="utdanning">Education:</label>
+        <input type="number" id="utdanning" name="utdanning" placeholder="Enter education level" required>
+
+        <label for="inntekt">Income:</label>
+        <input type="number" id="inntekt" name="inntekt" placeholder="Enter income level" required>
+
+        <label for="etnisitet">Ethnicity:</label>
+        <input type="text" id="etnisitet" name="etnisitet" placeholder="Enter ethnicity" required>
+
+        <!-- Medical Fields -->
+        <label for="sykehusdod">Hospital Death:</label>
+        <input type="number" id="sykehusdod" name="sykehusdod" placeholder="Enter 0 (No) or 1 (Yes)" required>
+
+        <label for="blodtrykk">Blood Pressure:</label>
+        <input type="number" id="blodtrykk" name="blodtrykk" placeholder="Enter blood pressure" required>
+
+        <label for="hvite_blodlegemer">White Blood Cells:</label>
+        <input type="number" id="hvite_blodlegemer" name="hvite_blodlegemer" placeholder="Enter count" required>
+
+        <label for="hjertefrekvens">Heart Rate:</label>
+        <input type="number" id="hjertefrekvens" name="hjertefrekvens" placeholder="Enter heart rate" required>
+
+        <label for="respirasjonsfrekvens">Respiratory Rate:</label>
+        <input type="number" id="respirasjonsfrekvens" name="respirasjonsfrekvens" placeholder="Enter respiratory rate" required>
+
+        <label for="kroppstemperatur">Body Temperature:</label>
+        <input type="number" id="kroppstemperatur" name="kroppstemperatur" placeholder="Enter temperature" required>
+
+        <label for="lungefunksjon">Lung Function:</label>
+        <input type="number" id="lungefunksjon" name="lungefunksjon" placeholder="Enter lung function" required>
+
+        <label for="serumalbumin">Serum Albumin:</label>
+        <input type="number" id="serumalbumin" name="serumalbumin" placeholder="Enter serum albumin" required>
+
+        <label for="bilirubin">Bilirubin:</label>
+        <input type="number" id="bilirubin" name="bilirubin" placeholder="Enter bilirubin level" required>
+
+        <label for="kreatinin">Creatinine:</label>
+        <input type="number" id="kreatinin" name="kreatinin" placeholder="Enter creatinine level" required>
+
+        <label for="natrium">Sodium:</label>
+        <input type="number" id="natrium" name="natrium" placeholder="Enter sodium level" required>
+
+        <label for="blod_ph">Blood pH:</label>
+        <input type="number" id="blod_ph" name="blod_ph" placeholder="Enter blood pH level" required>
+
+        <label for="glukose">Glucose:</label>
+        <input type="number" id="glukose" name="glukose" placeholder="Enter glucose level" required>
+
+        <label for="blodurea_nitrogen">Blood Urea Nitrogen:</label>
+        <input type="number" id="blodurea_nitrogen" name="blodurea_nitrogen" placeholder="Enter blood urea nitrogen level" required>
+
+        <label for="urinmengde">Urine Output:</label>
+        <input type="number" id="urinmengde" name="urinmengde" placeholder="Enter urine output" required>
+
+        <!-- More Medical Information -->
+        <label for="sykdomskategori_id">Disease Category ID:</label>
+        <input type="number" id="sykdomskategori_id" name="sykdomskategori_id" placeholder="Enter disease category ID" required>
+
+        <label for="sykdomskategori">Disease Category:</label>
+        <input type="text" id="sykdomskategori" name="sykdomskategori" placeholder="Enter disease category" required>
+
+        <label for="dodsfall">Death:</label>
+        <input type="number" id="dodsfall" name="dodsfall" placeholder="Enter 0 (No) or 1 (Yes)" required>
+
+        <label for="sykdom_underkategori">Sub-disease Category:</label>
+        <input type="text" id="sykdom_underkategori" name="sykdom_underkategori" placeholder="Enter sub-disease category" required>
+
+        <label for="antall_komorbiditeter">Number of Comorbidities:</label>
+        <input type="number" id="antall_komorbiditeter" name="antall_komorbiditeter" placeholder="Enter number of comorbidities" required>
+
+        <label for="koma_score">Coma Score:</label>
+        <input type="number" id="koma_score" name="koma_score" placeholder="Enter coma score" required>
+
+        <label for="adl_pasient">ADL Patient:</label>
+        <input type="number" id="adl_pasient" name="adl_pasient" placeholder="Enter ADL patient score" required>
+
+        <label for="adl_stedfortreder">ADL Representative:</label>
+        <input type="number" id="adl_stedfortreder" name="adl_stedfortreder" placeholder="Enter ADL representative score" required>
+
+        <label for="fysiologisk_score">Physiological Score:</label>
+        <input type="number" id="fysiologisk_score" name="fysiologisk_score" placeholder="Enter physiological score" required>
+
+        <label for="apache_fysiologisk_score">APACHE Physiological Score:</label>
+        <input type="number" id="apache_fysiologisk_score" name="apache_fysiologisk_score" placeholder="Enter APACHE score" required>
+
+        <label for="overlevelsesestimat_2mnd">2-Month Survival Estimate:</label>
+        <input type="number" id="overlevelsesestimat_2mnd" name="overlevelsesestimat_2mnd" placeholder="Enter 2-month survival estimate" required>
+
+        <label for="overlevelsesestimat_6mnd">6-Month Survival Estimate:</label>
+        <input type="number" id="overlevelsesestimat_6mnd" name="overlevelsesestimat_6mnd" placeholder="Enter 6-month survival estimate" required>
+
+        <label for="diabetes">Diabetes:</label>
+        <input type="number" id="diabetes" name="diabetes" placeholder="Enter 0 (No) or 1 (Yes)" required>
+
+        <label for="demens">Dementia:</label>
+        <input type="number" id="demens" name="demens" placeholder="Enter 0 (No) or 1 (Yes)" required>
+
+        <label for="kreft">Cancer:</label>
+        <input type="number" id="kreft" name="kreft" placeholder="Enter 0 (No) or 1 (Yes)" required>
+
+        <label for="lege_overlevelsesestimat_2mnd">Doctor's 2-Month Survival Estimate
