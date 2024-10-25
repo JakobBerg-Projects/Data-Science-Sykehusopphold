@@ -1,3 +1,4 @@
+# Definer numeriske og kategoriske kolonner
 import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
@@ -5,7 +6,6 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 
-# Definer numeriske og kategoriske kolonner
 numeric_cols = [
     'alder', 'utdanning', 'blodtrykk', 'hvite_blodlegemer', 'hjertefrekvens',
     'respirasjonsfrekvens', 'kroppstemperatur', 'lungefunksjon', 'serumalbumin',
@@ -15,7 +15,7 @@ numeric_cols = [
     'lege_overlevelsesestimat_6mnd', 'diabetes', 'glukose', 'blodurea_nitrogen',
     'urinmengde', 'demens'
 ]
-categorical_cols = ['kjønn', 'etnisitet', 'sykdomskategori', 'sykdom_underkategori', 'dnr_status', 'inntekt', 'kreft']
+categorical_cols = ['kjønn', 'etnisitet', 'sykdomskategori', 'sykdom_underkategori', 'dnr_status', 'inntekt']
 
 def create_severity_indicators(df):
     df['alvorlighetsgrad_høy'] = (df['fysiologisk_score'] > 60).astype(bool)
@@ -23,26 +23,32 @@ def create_severity_indicators(df):
     df['alvorlighetsgrad_middels'] = ((df['fysiologisk_score'] >= 10) & (df['fysiologisk_score'] <= 60)).astype(bool)
     return df
 
-def prepare_data_for_length_prediction(df, prediction_mode=False):
+def prepare_data_for_length_prediction(df, sykehusdod_model=None, prediction_mode=False):
     """
-    Forbereder data for prediksjon av sykehusoppholdslengde.
+    Prepares data for predicting hospital stay length. If 'sykehusdød' is missing, it is imputed using the provided classification model.
     """
     df = create_severity_indicators(df)
     df['alder_fysiologisk_interaction'] = df['alder'] * df['fysiologisk_score']
     df['age_binned'] = pd.cut(df['alder'], bins=[0, 30, 60, np.inf], labels=['young', 'middle-aged', 'senior'])
+
+    # If prediction_mode is True and 'sykehusdød' is missing, impute it using the classification model
+    if prediction_mode and 'sykehusdød' not in df.columns and sykehusdod_model:
+        X_classification, _, _, _ = prepare_data_for_death_classification(df, prediction_mode=True)
+        df['sykehusdød'] = sykehusdod_model.predict(X_classification)
     
-    # Ekskluder målvariabelen 'oppholdslengde' i treningsmodus
+    # Target variable 'oppholdslengde' for length prediction
     y = df['oppholdslengde'] if not prediction_mode else None
     if not prediction_mode:
-        df = df.drop(columns=['oppholdslengde'])
+        df = df.drop(columns=['oppholdslengde'])  # Don't drop 'sykehusdød', keep it as a feature
 
-    # Tilleggs kolonner
+    # Additional columns
     additional_numeric_cols = ['alder_fysiologisk_interaction']
-    additional_categorical_cols = ['age_binned']
+    additional_categorical_cols = ['age_binned', 'sykehusdød']  # Ensure 'sykehusdød' is in categorical features
     numeric_cols_all = numeric_cols + additional_numeric_cols
     categorical_cols_all = categorical_cols + additional_categorical_cols
 
     return df, numeric_cols_all, categorical_cols_all, y
+
 
 def prepare_data_for_death_classification(df, prediction_mode=False):
     """
