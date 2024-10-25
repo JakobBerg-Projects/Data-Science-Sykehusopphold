@@ -62,6 +62,9 @@
       {% if prediction_text %}
         <h2>Prediksjon: {{ prediction_text }}</h2>
       {% endif %}
+      {% if death_risk_message %}
+        <h2>{{ death_risk_message }}</h2>
+      {% endif %}
       
       <form action="{{url_for('predict')}}" method="post">
         <div class="form-grid">

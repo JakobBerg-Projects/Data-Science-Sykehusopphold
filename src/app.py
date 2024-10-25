@@ -3,12 +3,13 @@ import pandas as pd  # Import pandas for creating DataFrame
 import pickle
 from flask import Flask, request, render_template
 from waitress import serve
-from preprocessing import prepare_data_for_prediction, col_transformer
+from preprocessing import prepare_data_for_length_prediction, prepare_data_for_death_classification
 
 app = Flask(__name__)
 
 # Load the trained model from 'model.pkl'
 model, col_transformer, feature_names= pickle.load(open('model.pkl', 'rb'))
+sykehusdod_model = pickle.load(open('sykehusdod_model.pkl', 'rb'))
 
 @app.route('/')
 def home():
@@ -34,7 +35,8 @@ def predict():
             'sykdom_underkategori': [sub_disease],  # Use the selected sub-disease
             'dnr_status': [features.get('dnr_status', 'no')],  # Default to 'no'
             'inntekt': [features.get('inntekt', 'unknown')],  # Default to 'unknown'
-            'kreft': [features.get('kreft', 'no')]  # Default to 'no'
+            'kreft': [features.get('kreft', 'no')],  # Default to 'no'
+            'sykehusdød': [0]  # Set 'dødsfall' to 0 by default
         })
 
         # Automatically assign Disease Category based on the Sub-disease Category
@@ -98,27 +100,38 @@ def predict():
 
         # Convert input_data into a pandas DataFrame
         input_df = pd.DataFrame(input_data)
-        print(input_df)
+        
 
-        # Preprocess the input using the prepare_data_for_prediction function
-        input_df_prepared, _, _, _ = prepare_data_for_prediction(input_df, prediction_mode=True)
+        # Impute `sykehusdød` using classification model
+        X_classification, _, _, _ = prepare_data_for_death_classification(input_df, prediction_mode=True)
+        sykehusdod_prediction = sykehusdod_model.predict(X_classification)[0]
+        input_df['sykehusdød'] = sykehusdod_prediction
 
-        # Transform the input using the saved pipeline
+        # Step 6: Prepare data for length prediction
+        input_df_prepared, _, _, _ = prepare_data_for_length_prediction(input_df, prediction_mode=True)
+
+        # Step 7: Transform input data using `col_transformer`
         input_data_imputed = col_transformer.transform(input_df_prepared)
         
-        # Create a DataFrame with feature names
+        # Convert transformed data to DataFrame with correct feature names
         input_data_imputed_df = pd.DataFrame(input_data_imputed, columns=feature_names)
-        print(input_data_imputed_df)
 
-        # Predict the hospital stay length
+        # Step 8: Predict hospital stay length
         prediction = model.predict(input_data_imputed_df)[0]
 
+        
+        death_risk_message = "Warning: High risk of death detected." if sykehusdod_prediction == 1 else None
+
         # Render the result on the webpage
-        return render_template('index.html', prediction_text=f'Predicted Length of Stay: {prediction:.2f} days')
+        return render_template(
+            'index.html', 
+            prediction_text=f'Predicted Length of Stay: {prediction:.2f} days',
+            death_risk_message=death_risk_message
+        )
 
     except ValueError as e:
         print(f"Error processing input data: {e}")
-        return render_template('index.html', prediction_text='Invalid input for one or more fields')
+        
 
 if __name__ == '__main__':
     serve(app, host='0.0.0.0', port=8080)
