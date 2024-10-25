@@ -1,23 +1,34 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Hospital Stay Prediction</title>
+    <title>Prediksjon av Sykehusopphold</title>
     <style>
       body {
         font-family: Arial, sans-serif;
         background-color: #f2f2f2;
       }
       .container {
-        width: 50%;
+        width: 80%;
         margin: 0 auto;
         background-color: #fff;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
-      h1 {
+      h1, h2 {
         text-align: center;
         color: #333;
+      }
+      .form-grid {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+      }
+      .kategori {
+        flex: 1;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
       }
       label {
         font-weight: bold;
@@ -45,119 +56,164 @@
 
   <body>
     <div class="container">
-      <h1>Predict Hospital Stay Length</h1>
+      <h1>Estimere Lengde på Sykehusopphold</h1>
 
+      <!-- Denne blokken viser prediksjonen etter at skjemaet er sendt inn -->
+      {% if prediction_text %}
+        <h2>Prediksjon: {{ prediction_text }}</h2>
+      {% endif %}
+      
       <form action="{{url_for('predict')}}" method="post">
+        <div class="form-grid">
+          <!-- Sykdomsalvorlighet-kategorien -->
+          <div class="kategori">
+            <h2>Sykdomsalvorlighet</h2>
 
-        <!-- Numeric Fields -->
-        <label for="alder">Age:</label>
-        <input type="number" id="alder" name="alder" placeholder="Enter age" required>
+            <label for="sykdom_underkategori">Underkategori av Sykdom:</label>
+            <select id="sykdom_underkategori" name="sykdom_underkategori" required>
+              <option value="ARF/MOSF w/Sepsis">ARF/MOSF m/Sepsis</option>
+              <option value="CHF">Hjertesvikt (CHF)</option>
+              <option value="COPD">KOLS</option>
+              <option value="Lung Cancer">Lungekreft</option>
+              <option value="Colon Cancer">Tykktarmskreft</option>
+              <option value="Cirrhosis">Levercirrhose</option>
+              <option value="MOSF w/Malig">Flere Organsvikt (Malign)</option>
+              <option value="Coma">Koma</option>
+            </select>
 
-        <label for="kjonn">Gender:</label>
-        <select id="kjonn" name="kjonn" required>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-        </select>
 
-        <label for="utdanning">Education:</label>
-        <input type="number" id="utdanning" name="utdanning" placeholder="Enter education level" required>
+            <label for="antall_komorbiditeter">Antall Komorbiditeter:</label>
+            <input type="number" id="antall_komorbiditeter" name="antall_komorbiditeter" placeholder="Skriv inn antall komorbiditeter" required>
 
-        <label for="inntekt">Income:</label>
-        <input type="number" id="inntekt" name="inntekt" placeholder="Enter income level" required>
+            <label for="koma_score">Koma Score:</label>
+            <input type="number" id="koma_score" name="koma_score" placeholder="Skriv inn koma score" required>
 
-        <label for="etnisitet">Ethnicity:</label>
-        <input type="text" id="etnisitet" name="etnisitet" placeholder="Enter ethnicity" required>
+            <label for="adl_stedfortreder">ADL Stedfortreder:</label>
+            <input type="number" id="adl_stedfortreder" name="adl_stedfortreder" placeholder="Indeks for daglige funksjoner" required>
 
-        <!-- Medical Fields -->
-        <label for="sykehusdod">Hospital Death:</label>
-        <input type="number" id="sykehusdod" name="sykehusdod" placeholder="Enter 0 (No) or 1 (Yes)" required>
+            <label for="fysiologisk_score">Fysiologisk Score:</label>
+            <input type="number" id="fysiologisk_score" name="fysiologisk_score" placeholder="Skriv inn fysiologisk score" required>
 
-        <label for="blodtrykk">Blood Pressure:</label>
-        <input type="number" id="blodtrykk" name="blodtrykk" placeholder="Enter blood pressure" required>
+            <label for="apache_fysiologisk_score">APACHE Fysiologisk Score:</label>
+            <input type="number" id="apache_fysiologisk_score" name="apache_fysiologisk_score" placeholder="Skriv inn APACHE score" required>
 
-        <label for="hvite_blodlegemer">White Blood Cells:</label>
-        <input type="number" id="hvite_blodlegemer" name="hvite_blodlegemer" placeholder="Enter count" required>
+            <label for="overlevelsesestimat_2mnd">Overlevelsesestimat 2 mnd:</label>
+            <input type="number" id="overlevelsesestimat_2mnd" name="overlevelsesestimat_2mnd" placeholder="2-måneders overlevelsesestimat" required>
 
-        <label for="hjertefrekvens">Heart Rate:</label>
-        <input type="number" id="hjertefrekvens" name="hjertefrekvens" placeholder="Enter heart rate" required>
+            <label for="overlevelsesestimat_6mnd">Overlevelsesestimat 6 mnd:</label>
+            <input type="number" id="overlevelsesestimat_6mnd" name="overlevelsesestimat_6mnd" placeholder="6-måneders overlevelsesestimat" required>
 
-        <label for="respirasjonsfrekvens">Respiratory Rate:</label>
-        <input type="number" id="respirasjonsfrekvens" name="respirasjonsfrekvens" placeholder="Enter respiratory rate" required>
+            <label for="diabetes">Diabetes:</label>
+            <select id="diabetes" name="diabetes" required>
+              <option value="1">Ja</option>
+              <option value="0">Nei</option>
+            </select>
 
-        <label for="kroppstemperatur">Body Temperature:</label>
-        <input type="number" id="kroppstemperatur" name="kroppstemperatur" placeholder="Enter temperature" required>
+            <label for="demens">Demens:</label>
+            <select id="demens" name="demens" required>
+              <option value="1">Ja</option>
+              <option value="0">Nei</option>
+            </select>
 
-        <label for="lungefunksjon">Lung Function:</label>
-        <input type="number" id="lungefunksjon" name="lungefunksjon" placeholder="Enter lung function" required>
+            <label for="kreft">Kreft:</label>
+            <select id="kreft" name="kreft" required>
+              <option value="yes">Ja</option>
+              <option value="metastatic">Metastatisk</option>
+              <option value="no">Nei</option>
+            </select>
 
-        <label for="serumalbumin">Serum Albumin:</label>
-        <input type="number" id="serumalbumin" name="serumalbumin" placeholder="Enter serum albumin" required>
+            <label for="lege_overlevelsesestimat_2mnd">Lege Overlevelsesestimat 2 mnd:</label>
+            <input type="number" id="lege_overlevelsesestimat_2mnd" name="lege_overlevelsesestimat_2mnd" placeholder="Legens 2-måneders estimat" required>
 
-        <label for="bilirubin">Bilirubin:</label>
-        <input type="number" id="bilirubin" name="bilirubin" placeholder="Enter bilirubin level" required>
+            <label for="lege_overlevelsesestimat_6mnd">Lege Overlevelsesestimat 6 mnd:</label>
+            <input type="number" id="lege_overlevelsesestimat_6mnd" name="lege_overlevelsesestimat_6mnd" placeholder="Legens 6-måneders estimat" required>
 
-        <label for="kreatinin">Creatinine:</label>
-        <input type="number" id="kreatinin" name="kreatinin" placeholder="Enter creatinine level" required>
+            <label for="dnr_status">DNR Status:</label>
+            <select id="dnr_status" name="dnr_status" required>
+              <option value="dnr ved innleggelse">DNR ved Innleggelse</option>
+              <option value="dnr før innleggelse">DNR før Innleggelse</option>
+              <option value="ingen dnr">Ingen DNR</option>
+              <option value="mangler">Mangler DNR</option>
+            </select>
+          </div>
 
-        <label for="natrium">Sodium:</label>
-        <input type="number" id="natrium" name="natrium" placeholder="Enter sodium level" required>
+          <!-- Fysiologiske data-kategorien -->
+          <div class="kategori">
+            <h2>Fysiologiske data</h2>
+            <label for="blodtrykk">Blodtrykk:</label>
+            <input type="number" id="blodtrykk" name="blodtrykk" placeholder="Skriv inn blodtrykk" required>
 
-        <label for="blod_ph">Blood pH:</label>
-        <input type="number" id="blod_ph" name="blod_ph" placeholder="Enter blood pH level" required>
+            <label for="hvite_blodlegemer">Hvite Blodlegemer:</label>
+            <input type="number" id="hvite_blodlegemer" name="hvite_blodlegemer" placeholder="Skriv inn antall" required>
 
-        <label for="glukose">Glucose:</label>
-        <input type="number" id="glukose" name="glukose" placeholder="Enter glucose level" required>
+            <label for="hjertefrekvens">Hjertefrekvens:</label>
+            <input type="number" id="hjertefrekvens" name="hjertefrekvens" placeholder="Skriv inn hjertefrekvens" required>
 
-        <label for="blodurea_nitrogen">Blood Urea Nitrogen:</label>
-        <input type="number" id="blodurea_nitrogen" name="blodurea_nitrogen" placeholder="Enter blood urea nitrogen level" required>
+            <label for="respirasjonsfrekvens">Respirasjonsfrekvens:</label>
+            <input type="number" id="respirasjonsfrekvens" name="respirasjonsfrekvens" placeholder="Skriv inn respirasjonsfrekvens" required>
 
-        <label for="urinmengde">Urine Output:</label>
-        <input type="number" id="urinmengde" name="urinmengde" placeholder="Enter urine output" required>
+            <label for="kroppstemperatur">Kroppstemperatur:</label>
+            <input type="number" id="kroppstemperatur" name="kroppstemperatur" placeholder="Skriv inn temperatur" required>
 
-        <!-- More Medical Information -->
-        <label for="sykdomskategori_id">Disease Category ID:</label>
-        <input type="number" id="sykdomskategori_id" name="sykdomskategori_id" placeholder="Enter disease category ID" required>
+            <label for="lungefunksjon">Lungefunksjon (PaO2/FiO2):</label>
+            <input type="number" id="lungefunksjon" name="lungefunksjon" placeholder="Skriv inn lungefunksjon" required>
 
-        <label for="sykdomskategori">Disease Category:</label>
-        <input type="text" id="sykdomskategori" name="sykdomskategori" placeholder="Enter disease category" required>
+            <label for="serumalbumin">Serum Albumin:</label>
+            <input type="number" id="serumalbumin" name="serumalbumin" placeholder="Skriv inn serum albumin" required>
 
-        <label for="dodsfall">Death:</label>
-        <input type="number" id="dodsfall" name="dodsfall" placeholder="Enter 0 (No) or 1 (Yes)" required>
+            <label for="kreatinin">Kreatinin:</label>
+            <input type="number" id="kreatinin" name="kreatinin" placeholder="Skriv inn kreatininnivå" required>
 
-        <label for="sykdom_underkategori">Sub-disease Category:</label>
-        <input type="text" id="sykdom_underkategori" name="sykdom_underkategori" placeholder="Enter sub-disease category" required>
+            <label for="natrium">Natrium:</label>
+            <input type="number" id="natrium" name="natrium" placeholder="Skriv inn natriumnivå" required>
 
-        <label for="antall_komorbiditeter">Number of Comorbidities:</label>
-        <input type="number" id="antall_komorbiditeter" name="antall_komorbiditeter" placeholder="Enter number of comorbidities" required>
+            <label for="blod_ph">Blod pH:</label>
+            <input type="number" id="blod_ph" name="blod_ph" placeholder="Skriv inn blodets pH" required>
 
-        <label for="koma_score">Coma Score:</label>
-        <input type="number" id="koma_score" name="koma_score" placeholder="Enter coma score" required>
+            <label for="glukose">Glukose:</label>
+            <input type="number" id="glukose" name="glukose" placeholder="Skriv inn glukosenivå" required>
 
-        <label for="adl_pasient">ADL Patient:</label>
-        <input type="number" id="adl_pasient" name="adl_pasient" placeholder="Enter ADL patient score" required>
+            <label for="blodurea_nitrogen">Blodurea Nitrogen:</label>
+            <input type="number" id="blodurea_nitrogen" name="blodurea_nitrogen" placeholder="Skriv inn blodurea-nitrogen" required>
 
-        <label for="adl_stedfortreder">ADL Representative:</label>
-        <input type="number" id="adl_stedfortreder" name="adl_stedfortreder" placeholder="Enter ADL representative score" required>
+            <label for="urinmengde">Urinmengde:</label>
+            <input type="number" id="urinmengde" name="urinmengde" placeholder="Skriv inn urinmengde" required>
+          </div>
 
-        <label for="fysiologisk_score">Physiological Score:</label>
-        <input type="number" id="fysiologisk_score" name="fysiologisk_score" placeholder="Enter physiological score" required>
+          <!-- Demografisk data-kategorien -->
+          <div class="kategori">
+            <h2>Demografisk data</h2>
+            <label for="alder">Alder:</label>
+            <input type="number" id="alder" name="alder" placeholder="Skriv inn alder" required>
 
-        <label for="apache_fysiologisk_score">APACHE Physiological Score:</label>
-        <input type="number" id="apache_fysiologisk_score" name="apache_fysiologisk_score" placeholder="Enter APACHE score" required>
+            <label for="kjønn">Kjønn:</label>
+            <select id="kjønn" name="kjønn" required>
+              <option value="male">Mann</option>
+              <option value="female">Kvinne</option>
+            </select>
 
-        <label for="overlevelsesestimat_2mnd">2-Month Survival Estimate:</label>
-        <input type="number" id="overlevelsesestimat_2mnd" name="overlevelsesestimat_2mnd" placeholder="Enter 2-month survival estimate" required>
+            <label for="utdanning">Utdanning (år):</label>
+            <input type="number" id="utdanning" name="utdanning" placeholder="Skriv inn antall år utdanning" required>
 
-        <label for="overlevelsesestimat_6mnd">6-Month Survival Estimate:</label>
-        <input type="number" id="overlevelsesestimat_6mnd" name="overlevelsesestimat_6mnd" placeholder="Enter 6-month survival estimate" required>
+            <label for="inntekt">Inntekt:</label>
+            <input type="number" id="inntekt" name="inntekt" placeholder="Skriv inn inntekt" required>
 
-        <label for="diabetes">Diabetes:</label>
-        <input type="number" id="diabetes" name="diabetes" placeholder="Enter 0 (No) or 1 (Yes)" required>
+            <label for="etnisitet">Etnisitet:</label>
+            <select id="etnisitet" name="etnisitet" required>
+              <option value="white">Hvit</option>
+              <option value="black">Svart</option>
+              <option value="hispanic">Latinsk</option>
+              <option value="asian">Asiatisk</option>
+              <option value="other">Annet</option>
+            </select>
+          </div>
+        </div>
 
-        <label for="demens">Dementia:</label>
-        <input type="number" id="demens" name="demens" placeholder="Enter 0 (No) or 1 (Yes)" required>
+        <!-- Send-knapp -->
+        <button type="submit">Estimer</button>
+      </form>
 
-        <label for="kreft">Cancer:</label>
-        <input type="number" id="kreft" name="kreft" placeholder="Enter 0 (No) or 1 (Yes)" required>
-
-        <label for="lege_overlevelsesestimat_2mnd">Doctor's 2-Month Survival Estimate
+      
+    </div>
+  </body>
+</html>
