@@ -11,16 +11,25 @@ numeric_cols = [
     'respirasjonsfrekvens', 'kroppstemperatur', 'lungefunksjon', 'serumalbumin',
     'kreatinin', 'natrium', 'blod_ph', 'antall_komorbiditeter', 'koma_score',
     'fysiologisk_score', 'apache_fysiologisk_score', 'overlevelsesestimat_2mnd',
-    'overlevelsesestimat_6mnd', 'lege_overlevelsesestimat_2mnd',
-    'lege_overlevelsesestimat_6mnd', 'diabetes', 'glukose', 'blodurea_nitrogen',
-    'urinmengde', 'demens'
+    'overlevelsesestimat_6mnd', 'glukose', 'blodurea_nitrogen',
+    'urinmengde'
 ]
-categorical_cols = ['kjønn', 'etnisitet', 'sykdomskategori', 'sykdom_underkategori', 'dnr_status', 'inntekt']
+categorical_cols = ['kjønn', 'etnisitet', 'sykdomskategori', 'sykdom_underkategori', 'dnr_status', 'inntekt', 'demens', 'diabetes']
 
 def create_severity_indicators(df):
-    df['alvorlighetsgrad_høy'] = (df['fysiologisk_score'] > 60).astype(bool)
-    df['alvorlighetsgrad_lav'] = (df['fysiologisk_score'] < 10).astype(bool)
-    df['alvorlighetsgrad_middels'] = ((df['fysiologisk_score'] >= 10) & (df['fysiologisk_score'] <= 60)).astype(bool)
+    # Define severity levels based on 'fysiologisk_score'
+    df['alvorlighetsgrad'] = pd.cut(
+        df['fysiologisk_score'],
+        bins=[-np.inf, 10, 60, np.inf],
+        labels=['lav', 'middels', 'høy']
+    )
+    return df
+def create_omfattende_behandling(df):
+    df['omfattende_behandling'] = (
+        (df['koma_score'] == 0) & 
+        (df['antall_komorbiditeter'] >= 3) & 
+        (df['fysiologisk_score'].between(10, 60))
+    )
     return df
 
 def prepare_data_for_length_prediction(df, sykehusdod_model=None, prediction_mode=False):
@@ -28,6 +37,7 @@ def prepare_data_for_length_prediction(df, sykehusdod_model=None, prediction_mod
     Prepares data for predicting hospital stay length. If 'sykehusdød' is missing, it is imputed using the provided classification model.
     """
     df = create_severity_indicators(df)
+    df = create_omfattende_behandling(df)
     df['alder_fysiologisk_interaction'] = df['alder'] * df['fysiologisk_score']
     df['age_binned'] = pd.cut(df['alder'], bins=[0, 30, 60, np.inf], labels=['young', 'middle-aged', 'senior'])
 
@@ -43,7 +53,7 @@ def prepare_data_for_length_prediction(df, sykehusdod_model=None, prediction_mod
 
     # Additional columns
     additional_numeric_cols = ['alder_fysiologisk_interaction']
-    additional_categorical_cols = ['age_binned', 'sykehusdød']  # Ensure 'sykehusdød' is in categorical features
+    additional_categorical_cols = ['age_binned', 'sykehusdød', 'alvorlighetsgrad', 'omfattende_behandling']  # Ensure 'sykehusdød' is in categorical features
     numeric_cols_all = numeric_cols + additional_numeric_cols
     categorical_cols_all = categorical_cols + additional_categorical_cols
 
@@ -55,6 +65,7 @@ def prepare_data_for_death_classification(df, prediction_mode=False):
     Forbereder data for klassifikasjon av sykehusdød.
     """
     df = create_severity_indicators(df)
+    df = create_omfattende_behandling(df)
     df['alder_fysiologisk_interaction'] = df['alder'] * df['fysiologisk_score']
     df['age_binned'] = pd.cut(df['alder'], bins=[0, 30, 60, np.inf], labels=['young', 'middle-aged', 'senior'])
     
@@ -65,7 +76,7 @@ def prepare_data_for_death_classification(df, prediction_mode=False):
 
     # Tilleggs kolonner
     additional_numeric_cols = ['alder_fysiologisk_interaction']
-    additional_categorical_cols = ['age_binned']
+    additional_categorical_cols = ['age_binned', 'alvorlighetsgrad', 'omfattende_behandling']
     numeric_cols_all = numeric_cols + additional_numeric_cols
     categorical_cols_all = categorical_cols + additional_categorical_cols
 
@@ -73,9 +84,9 @@ def prepare_data_for_death_classification(df, prediction_mode=False):
 
 
 
-def get_col_transformer(numeric_cols, categorical_cols):
+def get_col_transformer(numeric_cols, categorical_cols, passthrough_cols):
     num_pipeline = Pipeline(steps=[
-        ('impute', SimpleImputer()),  
+        ('impute', SimpleImputer()),
         ('scaler', StandardScaler())  
     ])
 
@@ -83,8 +94,12 @@ def get_col_transformer(numeric_cols, categorical_cols):
         ('impute', SimpleImputer(strategy='most_frequent')),  
         ('one-hot-encoder', OneHotEncoder(handle_unknown='ignore', sparse_output=False))  
     ])
-    
+
+    # Del de kategoriske kolonnene mellom de som skal one-hot encodes og de som skal passeres gjennom
+    categorical_cols_to_encode = [col for col in categorical_cols if col not in passthrough_cols]
+
     return ColumnTransformer(transformers=[
         ('num_pipeline', num_pipeline, numeric_cols),
-        ('cat_pipeline', cat_pipeline, categorical_cols)
+        ('cat_pipeline', cat_pipeline, categorical_cols_to_encode),
+        ('passthrough', 'passthrough', passthrough_cols)  # Behandle spesifikke kolonner som 'passthrough'
     ])
