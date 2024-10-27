@@ -5,6 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
+from sklearn.impute import KNNImputer
 
 numeric_cols = [
     'alder', 'utdanning', 'blodtrykk', 'hvite_blodlegemer', 'hjertefrekvens',
@@ -31,6 +32,7 @@ def create_omfattende_behandling(df):
         (df['fysiologisk_score'].between(10, 60))
     )
     return df
+
 
 def prepare_data_for_length_prediction(df, sykehusdod_model=None, prediction_mode=False):
     """
@@ -85,21 +87,28 @@ def prepare_data_for_death_classification(df, prediction_mode=False):
 
 
 def get_col_transformer(numeric_cols, categorical_cols, passthrough_cols):
+    # Numerisk pipeline for imputering og skalering
     num_pipeline = Pipeline(steps=[
-        ('impute', SimpleImputer()),
+        ('impute', SimpleImputer(strategy='mean')), 
         ('scaler', StandardScaler())  
     ])
 
+    # Kategorisk pipeline for OneHotEncoding
     cat_pipeline = Pipeline(steps=[
-        ('impute', SimpleImputer(strategy='most_frequent')),  
+        ('impute', SimpleImputer(strategy='most_frequent')),
         ('one-hot-encoder', OneHotEncoder(handle_unknown='ignore', sparse_output=False))  
     ])
+    
+    # Pipeline for passthrough kolonner som kun skal imputeres
+    passthrough_pipeline = Pipeline(steps=[
+        ('impute', SimpleImputer(strategy='most_frequent'))
+    ])
 
-    # Del de kategoriske kolonnene mellom de som skal one-hot encodes og de som skal passeres gjennom
+    # Kategoriske kolonner som skal one-hot encodes
     categorical_cols_to_encode = [col for col in categorical_cols if col not in passthrough_cols]
 
     return ColumnTransformer(transformers=[
         ('num_pipeline', num_pipeline, numeric_cols),
         ('cat_pipeline', cat_pipeline, categorical_cols_to_encode),
-        ('passthrough', 'passthrough', passthrough_cols)  # Behandle spesifikke kolonner som 'passthrough'
+        ('passthrough_impute', passthrough_pipeline, passthrough_cols)  # Imputer passthrough kolonner uten encoding
     ])

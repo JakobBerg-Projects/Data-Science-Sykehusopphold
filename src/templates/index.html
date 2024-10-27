@@ -199,7 +199,12 @@
             <input type="number" id="utdanning" name="utdanning" placeholder="Skriv inn antall år utdanning" required>
 
             <label for="inntekt">Inntekt:</label>
-            <input type="number" id="inntekt" name="inntekt" placeholder="Skriv inn inntekt" required>
+            <select id="inntekt" name="inntekt" required>
+              <option value="under $11k">under $11k</option>
+              <option value="$11-$25k">$11-$25k</option>
+              <option value="$25-$50k">$25-$50k</option>>
+              <option value=">$50k">over $50k</option>>
+            </select>
 
             <label for="etnisitet">Etnisitet:</label>
             <select id="etnisitet" name="etnisitet" required>
