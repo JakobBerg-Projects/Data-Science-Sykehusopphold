@@ -58,7 +58,6 @@
     <div class="container">
       <h1>Estimere Lengde på Sykehusopphold</h1>
 
-      <!-- Denne blokken viser prediksjonen etter at skjemaet er sendt inn -->
       {% if prediction_text %}
         <h2>Prediksjon: {{ prediction_text }}</h2>
       {% endif %}
@@ -68,7 +67,6 @@
       
       <form action="{{url_for('predict')}}" method="post">
         <div class="form-grid">
-          <!-- Sykdomsalvorlighet-kategorien -->
           <div class="kategori">
             <h2>Sykdomsalvorlighet</h2>
 
@@ -84,27 +82,26 @@
               <option value="Coma">Koma</option>
             </select>
 
-
             <label for="antall_komorbiditeter">Antall Komorbiditeter:</label>
             <input type="number" id="antall_komorbiditeter" name="antall_komorbiditeter" placeholder="Skriv inn antall komorbiditeter" required>
 
             <label for="koma_score">Koma Score:</label>
-            <input type="number" id="koma_score" name="koma_score" placeholder="Skriv inn koma score" required>
+            <input type="number" id="koma_score" name="koma_score" placeholder="Skriv inn koma score" step="any" required>
 
             <label for="adl_stedfortreder">ADL Stedfortreder:</label>
-            <input type="number" id="adl_stedfortreder" name="adl_stedfortreder" placeholder="Indeks for daglige funksjoner" required>
+            <input type="number" id="adl_stedfortreder" name="adl_stedfortreder" placeholder="Indeks for daglige funksjoner" step="any" required>
 
             <label for="fysiologisk_score">Fysiologisk Score:</label>
-            <input type="number" id="fysiologisk_score" name="fysiologisk_score" placeholder="Skriv inn fysiologisk score" required>
+            <input type="number" id="fysiologisk_score" name="fysiologisk_score" placeholder="Skriv inn fysiologisk score" step="any" required>
 
             <label for="apache_fysiologisk_score">APACHE Fysiologisk Score:</label>
-            <input type="number" id="apache_fysiologisk_score" name="apache_fysiologisk_score" placeholder="Skriv inn APACHE score" required>
+            <input type="number" id="apache_fysiologisk_score" name="apache_fysiologisk_score" placeholder="Skriv inn APACHE score" step="any" required>
 
             <label for="overlevelsesestimat_2mnd">Overlevelsesestimat 2 mnd:</label>
-            <input type="number" id="overlevelsesestimat_2mnd" name="overlevelsesestimat_2mnd" placeholder="2-måneders overlevelsesestimat" required>
+            <input type="number" id="overlevelsesestimat_2mnd" name="overlevelsesestimat_2mnd" placeholder="2-måneders overlevelsesestimat" step="any" required>
 
             <label for="overlevelsesestimat_6mnd">Overlevelsesestimat 6 mnd:</label>
-            <input type="number" id="overlevelsesestimat_6mnd" name="overlevelsesestimat_6mnd" placeholder="6-måneders overlevelsesestimat" required>
+            <input type="number" id="overlevelsesestimat_6mnd" name="overlevelsesestimat_6mnd" placeholder="6-måneders overlevelsesestimat" step="any" required>
 
             <label for="diabetes">Diabetes:</label>
             <select id="diabetes" name="diabetes" required>
@@ -126,10 +123,10 @@
             </select>
 
             <label for="lege_overlevelsesestimat_2mnd">Lege Overlevelsesestimat 2 mnd:</label>
-            <input type="number" id="lege_overlevelsesestimat_2mnd" name="lege_overlevelsesestimat_2mnd" placeholder="Legens 2-måneders estimat" required>
+            <input type="number" id="lege_overlevelsesestimat_2mnd" name="lege_overlevelsesestimat_2mnd" placeholder="Legens 2-måneders estimat" step="any" required>
 
             <label for="lege_overlevelsesestimat_6mnd">Lege Overlevelsesestimat 6 mnd:</label>
-            <input type="number" id="lege_overlevelsesestimat_6mnd" name="lege_overlevelsesestimat_6mnd" placeholder="Legens 6-måneders estimat" required>
+            <input type="number" id="lege_overlevelsesestimat_6mnd" name="lege_overlevelsesestimat_6mnd" placeholder="Legens 6-måneders estimat" step="any" required>
 
             <label for="dnr_status">DNR Status:</label>
             <select id="dnr_status" name="dnr_status" required>
@@ -140,50 +137,48 @@
             </select>
           </div>
 
-          <!-- Fysiologiske data-kategorien -->
           <div class="kategori">
             <h2>Fysiologiske data</h2>
             <label for="blodtrykk">Blodtrykk:</label>
-            <input type="number" id="blodtrykk" name="blodtrykk" placeholder="Skriv inn blodtrykk" required>
+            <input type="number" id="blodtrykk" name="blodtrykk" placeholder="Skriv inn blodtrykk" step="any" required>
 
             <label for="hvite_blodlegemer">Hvite Blodlegemer:</label>
-            <input type="number" id="hvite_blodlegemer" name="hvite_blodlegemer" placeholder="Skriv inn antall" required>
+            <input type="number" id="hvite_blodlegemer" name="hvite_blodlegemer" placeholder="Skriv inn antall" step="any" required>
 
             <label for="hjertefrekvens">Hjertefrekvens:</label>
-            <input type="number" id="hjertefrekvens" name="hjertefrekvens" placeholder="Skriv inn hjertefrekvens" required>
+            <input type="number" id="hjertefrekvens" name="hjertefrekvens" placeholder="Skriv inn hjertefrekvens" step="any" required>
 
             <label for="respirasjonsfrekvens">Respirasjonsfrekvens:</label>
-            <input type="number" id="respirasjonsfrekvens" name="respirasjonsfrekvens" placeholder="Skriv inn respirasjonsfrekvens" required>
+            <input type="number" id="respirasjonsfrekvens" name="respirasjonsfrekvens" placeholder="Skriv inn respirasjonsfrekvens" step="any" required>
 
             <label for="kroppstemperatur">Kroppstemperatur:</label>
-            <input type="number" id="kroppstemperatur" name="kroppstemperatur" placeholder="Skriv inn temperatur" required>
+            <input type="number" id="kroppstemperatur" name="kroppstemperatur" placeholder="Skriv inn temperatur" step="any" required>
 
             <label for="lungefunksjon">Lungefunksjon (PaO2/FiO2):</label>
-            <input type="number" id="lungefunksjon" name="lungefunksjon" placeholder="Skriv inn lungefunksjon" required>
+            <input type="number" id="lungefunksjon" name="lungefunksjon" placeholder="Skriv inn lungefunksjon" step="any" required>
 
             <label for="serumalbumin">Serum Albumin:</label>
-            <input type="number" id="serumalbumin" name="serumalbumin" placeholder="Skriv inn serum albumin" required>
+            <input type="number" id="serumalbumin" name="serumalbumin" placeholder="Skriv inn serum albumin" step="any" required>
 
             <label for="kreatinin">Kreatinin:</label>
-            <input type="number" id="kreatinin" name="kreatinin" placeholder="Skriv inn kreatininnivå" required>
+            <input type="number" id="kreatinin" name="kreatinin" placeholder="Skriv inn kreatininnivå" step="any" required>
 
             <label for="natrium">Natrium:</label>
-            <input type="number" id="natrium" name="natrium" placeholder="Skriv inn natriumnivå" required>
+            <input type="number" id="natrium" name="natrium" placeholder="Skriv inn natriumnivå" step="any" required>
 
             <label for="blod_ph">Blod pH:</label>
-            <input type="number" id="blod_ph" name="blod_ph" placeholder="Skriv inn blodets pH" required>
+            <input type="number" id="blod_ph" name="blod_ph" placeholder="Skriv inn blodets pH" step="any" required>
 
             <label for="glukose">Glukose:</label>
-            <input type="number" id="glukose" name="glukose" placeholder="Skriv inn glukosenivå" required>
+            <input type="number" id="glukose" name="glukose" placeholder="Skriv inn glukosenivå" step="any" required>
 
             <label for="blodurea_nitrogen">Blodurea Nitrogen:</label>
-            <input type="number" id="blodurea_nitrogen" name="blodurea_nitrogen" placeholder="Skriv inn blodurea-nitrogen" required>
+            <input type="number" id="blodurea_nitrogen" name="blodurea_nitrogen" placeholder="Skriv inn blodurea-nitrogen" step="any" required>
 
             <label for="urinmengde">Urinmengde:</label>
-            <input type="number" id="urinmengde" name="urinmengde" placeholder="Skriv inn urinmengde" required>
+            <input type="number" id="urinmengde" name="urinmengde" placeholder="Skriv inn urinmengde" step="any" required>
           </div>
 
-          <!-- Demografisk data-kategorien -->
           <div class="kategori">
             <h2>Demografisk data</h2>
             <label for="alder">Alder:</label>
@@ -196,14 +191,14 @@
             </select>
 
             <label for="utdanning">Utdanning (år):</label>
-            <input type="number" id="utdanning" name="utdanning" placeholder="Skriv inn antall år utdanning" required>
+            <input type="number" id="utdanning" name="utdanning" placeholder="Skriv inn antall år utdanning" step="any" required>
 
             <label for="inntekt">Inntekt:</label>
             <select id="inntekt" name="inntekt" required>
               <option value="under $11k">under $11k</option>
               <option value="$11-$25k">$11-$25k</option>
-              <option value="$25-$50k">$25-$50k</option>>
-              <option value=">$50k">over $50k</option>>
+              <option value="$25-$50k">$25-$50k</option>
+              <option value=">$50k">over $50k</option>
             </select>
 
             <label for="etnisitet">Etnisitet:</label>
@@ -217,11 +212,8 @@
           </div>
         </div>
 
-        <!-- Send-knapp -->
         <button type="submit">Estimer</button>
       </form>
-
-      
     </div>
   </body>
 </html>
