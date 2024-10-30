@@ -71,7 +71,7 @@
             <h2>Sykdomsalvorlighet</h2>
 
             <label for="sykdom_underkategori">Underkategori av Sykdom:</label>
-            <select id="sykdom_underkategori" name="sykdom_underkategori" required>
+            <select id="sykdom_underkategori" name="sykdom_underkategori">
               <option value="ARF/MOSF w/Sepsis">ARF/MOSF m/Sepsis</option>
               <option value="CHF">Hjertesvikt (CHF)</option>
               <option value="COPD">KOLS</option>
@@ -83,53 +83,53 @@
             </select>
 
             <label for="antall_komorbiditeter">Antall Komorbiditeter:</label>
-            <input type="number" id="antall_komorbiditeter" name="antall_komorbiditeter" placeholder="Skriv inn antall komorbiditeter" required>
+            <input type="number" id="antall_komorbiditeter" name="antall_komorbiditeter" placeholder="Skriv inn antall komorbiditeter" min="0">
 
             <label for="koma_score">Koma Score:</label>
-            <input type="number" id="koma_score" name="koma_score" placeholder="Skriv inn koma score" step="any" required>
+            <input type="number" id="koma_score" name="koma_score" placeholder="Skriv inn koma score" step="any" min="0">
 
             <label for="adl_stedfortreder">ADL Stedfortreder:</label>
-            <input type="number" id="adl_stedfortreder" name="adl_stedfortreder" placeholder="Indeks for daglige funksjoner" step="any" required>
+            <input type="number" id="adl_stedfortreder" name="adl_stedfortreder" placeholder="Indeks for daglige funksjoner" step="any" min="0">
 
             <label for="fysiologisk_score">Fysiologisk Score:</label>
-            <input type="number" id="fysiologisk_score" name="fysiologisk_score" placeholder="Skriv inn fysiologisk score" step="any" required>
+            <input type="number" id="fysiologisk_score" name="fysiologisk_score" placeholder="Skriv inn fysiologisk score" step="any" min="0">
 
             <label for="apache_fysiologisk_score">APACHE Fysiologisk Score:</label>
-            <input type="number" id="apache_fysiologisk_score" name="apache_fysiologisk_score" placeholder="Skriv inn APACHE score" step="any" required>
+            <input type="number" id="apache_fysiologisk_score" name="apache_fysiologisk_score" placeholder="Skriv inn APACHE score" step="any" min="0">
 
             <label for="overlevelsesestimat_2mnd">Overlevelsesestimat 2 mnd:</label>
-            <input type="number" id="overlevelsesestimat_2mnd" name="overlevelsesestimat_2mnd" placeholder="2-måneders overlevelsesestimat" step="any" required>
+            <input type="number" id="overlevelsesestimat_2mnd" name="overlevelsesestimat_2mnd" placeholder="2-måneders overlevelsesestimat" step="any" min="0">
 
             <label for="overlevelsesestimat_6mnd">Overlevelsesestimat 6 mnd:</label>
-            <input type="number" id="overlevelsesestimat_6mnd" name="overlevelsesestimat_6mnd" placeholder="6-måneders overlevelsesestimat" step="any" required>
+            <input type="number" id="overlevelsesestimat_6mnd" name="overlevelsesestimat_6mnd" placeholder="6-måneders overlevelsesestimat" step="any" min="0">
 
             <label for="diabetes">Diabetes:</label>
-            <select id="diabetes" name="diabetes" required>
+            <select id="diabetes" name="diabetes">
               <option value="1">Ja</option>
               <option value="0">Nei</option>
             </select>
 
             <label for="demens">Demens:</label>
-            <select id="demens" name="demens" required>
+            <select id="demens" name="demens">
               <option value="1">Ja</option>
               <option value="0">Nei</option>
             </select>
 
             <label for="kreft">Kreft:</label>
-            <select id="kreft" name="kreft" required>
+            <select id="kreft" name="kreft">
               <option value="yes">Ja</option>
               <option value="metastatic">Metastatisk</option>
               <option value="no">Nei</option>
             </select>
 
             <label for="lege_overlevelsesestimat_2mnd">Lege Overlevelsesestimat 2 mnd:</label>
-            <input type="number" id="lege_overlevelsesestimat_2mnd" name="lege_overlevelsesestimat_2mnd" placeholder="Legens 2-måneders estimat" step="any" required>
+            <input type="number" id="lege_overlevelsesestimat_2mnd" name="lege_overlevelsesestimat_2mnd" placeholder="Legens 2-måneders estimat" step="any" min="0">
 
             <label for="lege_overlevelsesestimat_6mnd">Lege Overlevelsesestimat 6 mnd:</label>
-            <input type="number" id="lege_overlevelsesestimat_6mnd" name="lege_overlevelsesestimat_6mnd" placeholder="Legens 6-måneders estimat" step="any" required>
+            <input type="number" id="lege_overlevelsesestimat_6mnd" name="lege_overlevelsesestimat_6mnd" placeholder="Legens 6-måneders estimat" step="any" min="0">
 
             <label for="dnr_status">DNR Status:</label>
-            <select id="dnr_status" name="dnr_status" required>
+            <select id="dnr_status" name="dnr_status">
               <option value="dnr ved innleggelse">DNR ved Innleggelse</option>
               <option value="dnr før innleggelse">DNR før Innleggelse</option>
               <option value="ingen dnr">Ingen DNR</option>
@@ -140,58 +140,58 @@
           <div class="kategori">
             <h2>Fysiologiske data</h2>
             <label for="blodtrykk">Blodtrykk:</label>
-            <input type="number" id="blodtrykk" name="blodtrykk" placeholder="Skriv inn blodtrykk" step="any" required>
+            <input type="number" id="blodtrykk" name="blodtrykk" placeholder="Skriv inn blodtrykk" step="any" min="0">
 
             <label for="hvite_blodlegemer">Hvite Blodlegemer:</label>
-            <input type="number" id="hvite_blodlegemer" name="hvite_blodlegemer" placeholder="Skriv inn antall" step="any" required>
+            <input type="number" id="hvite_blodlegemer" name="hvite_blodlegemer" placeholder="Skriv inn antall" step="any" min="0">
 
             <label for="hjertefrekvens">Hjertefrekvens:</label>
-            <input type="number" id="hjertefrekvens" name="hjertefrekvens" placeholder="Skriv inn hjertefrekvens" step="any" required>
+            <input type="number" id="hjertefrekvens" name="hjertefrekvens" placeholder="Skriv inn hjertefrekvens" step="any" min="0">
 
             <label for="respirasjonsfrekvens">Respirasjonsfrekvens:</label>
-            <input type="number" id="respirasjonsfrekvens" name="respirasjonsfrekvens" placeholder="Skriv inn respirasjonsfrekvens" step="any" required>
+            <input type="number" id="respirasjonsfrekvens" name="respirasjonsfrekvens" placeholder="Skriv inn respirasjonsfrekvens" step="any" min="0">
 
             <label for="kroppstemperatur">Kroppstemperatur:</label>
-            <input type="number" id="kroppstemperatur" name="kroppstemperatur" placeholder="Skriv inn temperatur" step="any" required>
+            <input type="number" id="kroppstemperatur" name="kroppstemperatur" placeholder="Skriv inn temperatur" step="any" min="0">
 
             <label for="lungefunksjon">Lungefunksjon (PaO2/FiO2):</label>
-            <input type="number" id="lungefunksjon" name="lungefunksjon" placeholder="Skriv inn lungefunksjon" step="any" required>
+            <input type="number" id="lungefunksjon" name="lungefunksjon" placeholder="Skriv inn lungefunksjon" step="any" min="0">
 
             <label for="serumalbumin">Serum Albumin:</label>
-            <input type="number" id="serumalbumin" name="serumalbumin" placeholder="Skriv inn serum albumin" step="any" required>
+            <input type="number" id="serumalbumin" name="serumalbumin" placeholder="Skriv inn serum albumin" step="any" min="0">
 
             <label for="kreatinin">Kreatinin:</label>
-            <input type="number" id="kreatinin" name="kreatinin" placeholder="Skriv inn kreatininnivå" step="any" required>
+            <input type="number" id="kreatinin" name="kreatinin" placeholder="Skriv inn kreatininnivå" step="any" min="0">
 
             <label for="natrium">Natrium:</label>
-            <input type="number" id="natrium" name="natrium" placeholder="Skriv inn natriumnivå" step="any" required>
+            <input type="number" id="natrium" name="natrium" placeholder="Skriv inn natriumnivå" step="any" min="0">
 
             <label for="blod_ph">Blod pH:</label>
-            <input type="number" id="blod_ph" name="blod_ph" placeholder="Skriv inn blodets pH" step="any" required>
+            <input type="number" id="blod_ph" name="blod_ph" placeholder="Skriv inn blodets pH" step="any" min="0">
 
             <label for="glukose">Glukose:</label>
-            <input type="number" id="glukose" name="glukose" placeholder="Skriv inn glukosenivå" step="any" required>
+            <input type="number" id="glukose" name="glukose" placeholder="Skriv inn glukosenivå" step="any" min="0">
 
             <label for="blodurea_nitrogen">Blodurea Nitrogen:</label>
-            <input type="number" id="blodurea_nitrogen" name="blodurea_nitrogen" placeholder="Skriv inn blodurea-nitrogen" step="any" required>
+            <input type="number" id="blodurea_nitrogen" name="blodurea_nitrogen" placeholder="Skriv inn blodurea-nitrogen" step="any" min="0">
 
             <label for="urinmengde">Urinmengde:</label>
-            <input type="number" id="urinmengde" name="urinmengde" placeholder="Skriv inn urinmengde" step="any" required>
+            <input type="number" id="urinmengde" name="urinmengde" placeholder="Skriv inn urinmengde" step="any" min="0">
           </div>
 
           <div class="kategori">
             <h2>Demografisk data</h2>
             <label for="alder">Alder:</label>
-            <input type="number" id="alder" name="alder" placeholder="Skriv inn alder" required>
+            <input type="number" id="alder" name="alder" placeholder="Skriv inn alder">
 
             <label for="kjønn">Kjønn:</label>
-            <select id="kjønn" name="kjønn" required>
+            <select id="kjønn" name="kjønn">
               <option value="male">Mann</option>
               <option value="female">Kvinne</option>
             </select>
 
             <label for="utdanning">Utdanning (år):</label>
-            <input type="number" id="utdanning" name="utdanning" placeholder="Skriv inn antall år utdanning" step="any" required>
+            <input type="number" id="utdanning" name="utdanning" placeholder="Skriv inn antall år utdanning" step="any" min="0">
 
             <label for="inntekt">Inntekt:</label>
             <select id="inntekt" name="inntekt" required>
@@ -202,7 +202,7 @@
             </select>
 
             <label for="etnisitet">Etnisitet:</label>
-            <select id="etnisitet" name="etnisitet" required>
+            <select id="etnisitet" name="etnisitet">
               <option value="white">Hvit</option>
               <option value="black">Svart</option>
               <option value="hispanic">Latinsk</option>

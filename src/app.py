@@ -1,14 +1,17 @@
 import numpy as np
-import pandas as pd  # Import pandas for creating DataFrame
+import pandas as pd  
 import pickle
 from flask import Flask, request, render_template
 from waitress import serve
 from preprocessing import prepare_data_for_length_prediction, prepare_data_for_death_classification
 
+
 app = Flask(__name__)
 
-# Load the trained model from 'model.pkl'
+# Last inn den trente regresjonsmodellen fra 'model.pkl'
 model, col_transformer, feature_names= pickle.load(open('model.pkl', 'rb'))
+
+# Last inn den trente klassifikasjonsmodellen fra 'sykehusdod_model.pkl'
 sykehusdod_model = pickle.load(open('sykehusdod_model.pkl', 'rb'))
 
 @app.route('/')
@@ -17,17 +20,14 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    ''' 
-    Render the prediction result on HTML
-    '''
-    # Get data from form
+    # Hent data fra skjemaet
     features = dict(request.form)
     
     try:
-        # Extract all input values from the form
+        # Henter ut alle inputverdier fra skjemaet
         input_data = {}
         
-        # Categorical data
+        # Kategoriske data
         sub_disease = features.get('sykdom_underkategori', 'other')
         input_data.update({
             'kjønn': [features.get('kjønn', 'male')],  # Default to 'male'
@@ -39,7 +39,7 @@ def predict():
             'sykehusdød': [0]  # Set 'dødsfall' to 0 by default
         })
 
-        # Automatically assign Disease Category based on the Sub-disease Category
+        # Automatiser tildeling av sykdomskategori basert på sykdom_underkategori
         sub_disease_to_disease_mapping = {
             'sykdom_ARF/MOSF w/Sepsis': 'ARF/MOSF',
             'sykdom_hjertesvikt': 'COPD/CHF/Cirrhosis',
@@ -55,36 +55,8 @@ def predict():
             'sykdomskategori': [sykdomskategori]
         })
 
-        # Numeric data
-        input_data.update({
-            'alder': [float(features.get('alder', 0))],
-            'utdanning': [float(features.get('utdanning', 0))],
-            'blodtrykk': [float(features.get('blodtrykk', 0))],
-            'hvite_blodlegemer': [float(features.get('hvite_blodlegemer', 0))],
-            'hjertefrekvens': [float(features.get('hjertefrekvens', 0))],
-            'respirasjonsfrekvens': [float(features.get('respirasjonsfrekvens', 0))],
-            'kroppstemperatur': [float(features.get('kroppstemperatur', 0))],
-            'lungefunksjon': [float(features.get('lungefunksjon', 0))],
-            'serumalbumin': [float(features.get('serumalbumin', 0))],
-            'kreatinin': [float(features.get('kreatinin', 0))],
-            'natrium': [float(features.get('natrium', 0))],
-            'blod_ph': [float(features.get('blod_ph', 0))],
-            'glukose': [float(features.get('glukose', 0))],
-            'blodurea_nitrogen': [float(features.get('blodurea_nitrogen', 0))],
-            'urinmengde': [float(features.get('urinmengde', 0))],
-            'antall_komorbiditeter': [float(features.get('antall_komorbiditeter', 0))],
-            'koma_score': [float(features.get('koma_score', 0))],
-            'fysiologisk_score': [float(features.get('fysiologisk_score', 0))],
-            'apache_fysiologisk_score': [float(features.get('apache_fysiologisk_score', 0))],
-            'overlevelsesestimat_2mnd': [float(features.get('overlevelsesestimat_2mnd', 0))],
-            'overlevelsesestimat_6mnd': [float(features.get('overlevelsesestimat_6mnd', 0))],
-            'lege_overlevelsesestimat_2mnd': [float(features.get('lege_overlevelsesestimat_2mnd', 0))],
-            'lege_overlevelsesestimat_6mnd': [float(features.get('lege_overlevelsesestimat_6mnd', 0))],
-            'diabetes': [float(features.get('diabetes', 0))],
-            'demens': [float(features.get('demens', 0))],
-            'sykehusdød': [float(features.get('sykehusdød', 0))],
-        })
-        # Numeric data
+       
+        # Numeriske data
         numeric_fields = [
             'alder', 'utdanning', 'blodtrykk', 'hvite_blodlegemer', 'hjertefrekvens',
             'respirasjonsfrekvens', 'kroppstemperatur', 'lungefunksjon', 'serumalbumin',
@@ -95,34 +67,37 @@ def predict():
             'diabetes', 'demens', 'dødsfall'
         ]
 
+        # Legg til numeriske felt i input_data med NaN for tomme felt
         for field in numeric_fields:
-            input_data[field] = [float(features.get(field, 0))]
+            value = features.get(field, 0)
+            input_data[field] = [float(value) if value != "" else np.nan]
 
-        # Convert input_data into a pandas DataFrame
+        # Konverter input_data til en pandas DataFrame
         input_df = pd.DataFrame(input_data)
+        input_df.replace('', np.nan, inplace=True) # Erstatt tomme strenger med NaN
         
 
-        # Impute `sykehusdød` using classification model
+        # Imputer `sykehusdød` ved hjelp av klassifikasjonsmodellen
         X_classification, _, _, _ = prepare_data_for_death_classification(input_df, prediction_mode=True)
         sykehusdod_prediction = sykehusdod_model.predict(X_classification)[0]
         input_df['sykehusdød'] = sykehusdod_prediction
 
-        # Step 6: Prepare data for length prediction
+        # Forbered data til lengdeprediksjon
         input_df_prepared, _, _, _ = prepare_data_for_length_prediction(input_df, prediction_mode=True)
 
-        # Step 7: Transform input data using `col_transformer`
+        # Transformer input data ved hjelp av `col_transformer`
         input_data_imputed = col_transformer.transform(input_df_prepared)
         
-        # Convert transformed data to DataFrame with correct feature names
+        # Konverter transformert data til DataFrame med riktige kolonnenavn
         input_data_imputed_df = pd.DataFrame(input_data_imputed, columns=feature_names)
 
-        # Step 8: Predict hospital stay length
+        # Prediker lengden på oppholdet
         prediction = model.predict(input_data_imputed_df)[0]
 
-        
-        death_risk_message = "Warning: High risk of death detected." if sykehusdod_prediction == 1 else None
+        # Vis en risikomelding for død hvis `sykehusdød` er positiv
+        death_risk_message = "Advarsel: Høy risiko for død." if sykehusdod_prediction == 1 else None
 
-        # Render the result on the webpage
+        # Vis resultatet på nettsiden
         return render_template(
             'index.html', 
             prediction_text=f'Predicted Length of Stay: {prediction:.2f} days',
