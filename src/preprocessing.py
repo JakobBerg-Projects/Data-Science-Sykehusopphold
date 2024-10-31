@@ -34,11 +34,9 @@ def create_omfattende_behandling(df):
     )
     return df
 
-def gjennomsnitt__oppholdslengde_sykdom(df):
-    # Beregn gjennomsnittlig oppholdslengde per 'sykdom_underkategori'
-    avg_length_by_category = df.groupby('sykdom_underkategori')['oppholdslengde'].mean()
-    df['gjennomsnitt_oppholdslengde_sykdom_underkategori'] = df['sykdom_underkategori'].map(avg_length_by_category)
-    
+def gjennomsnitt__oppholdslengde_sykdom(df, avg_length_dict):
+    # Bruk den forhåndsberegnede dictionary til å mappe gjennomsnittsverdiene
+    df['gjennomsnitt_oppholdslengde_sykdom_underkategori'] = df['sykdom_underkategori'].map(avg_length_dict)
     return df
 
 def ingen_dnr(df):
@@ -50,13 +48,13 @@ def ingen_dnr(df):
     
     return df
 
-def prepare_data_for_length_prediction(df, sykehusdod_model=None, prediction_mode=False):
+def prepare_data_for_length_prediction(df, avg_length_dict, sykehusdod_model=None, prediction_mode=False):
     df = create_severity_indicators(df)
     df = create_omfattende_behandling(df)
-    df = gjennomsnitt__oppholdslengde_sykdom(df)
+    df = gjennomsnitt__oppholdslengde_sykdom(df, avg_length_dict)
     df = ingen_dnr(df)
     df['alder_fysiologisk_interaction'] = df['alder'] * df['fysiologisk_score']
-    df['age_binned'] = pd.cut(df['alder'], bins=[0, 30, 60, np.inf], labels=['young', 'middle-aged', 'senior'])
+    df['age_binned'] = pd.cut(df['alder'], bins=[0, 30, 60, np.inf], labels=['ung', 'middelaldrende', 'eldre'])
 
     # Imputer 'sykehusdød' hvis den mangler og 'prediction_mode' er aktivert
     if prediction_mode and 'sykehusdød' not in df.columns and sykehusdod_model:

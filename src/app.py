@@ -14,6 +14,11 @@ model, col_transformer, feature_names= pickle.load(open('model.pkl', 'rb'))
 # Last inn den trente klassifikasjonsmodellen fra 'sykehusdod_model.pkl'
 sykehusdod_model = pickle.load(open('sykehusdod_model.pkl', 'rb'))
 
+# Laster inn dict over gjennomsnittlig oppholdslengde fra treningsdataen
+gjennomsnitt_oppholdslengde = pickle.load(open('avg_length_by_category_dict.pkl', 'rb'))
+with open('avg_length_by_category_dict.pkl', 'rb') as f:
+    avg_length_by_category_dict = pickle.load(f)
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -30,13 +35,13 @@ def predict():
         # Kategoriske data
         sub_disease = features.get('sykdom_underkategori', 'other')
         input_data.update({
-            'kjønn': [features.get('kjønn', 'male')],  # Default to 'male'
-            'etnisitet': [features.get('etnisitet', 'white')],  # Default to 'white'
-            'sykdom_underkategori': [sub_disease],  # Use the selected sub-disease
-            'dnr_status': [features.get('dnr_status', 'no')],  # Default to 'no'
-            'inntekt': [features.get('inntekt', 'unknown')],  # Default to 'unknown'
-            'kreft': [features.get('kreft', 'no')],  # Default to 'no'
-            'sykehusdød': [0]  # Set 'dødsfall' to 0 by default
+            'kjønn': [features.get('kjønn', 'male')],  
+            'etnisitet': [features.get('etnisitet', 'white')],  
+            'sykdom_underkategori': [sub_disease],  
+            'dnr_status': [features.get('dnr_status', 'ingen_dnr')],  
+            'inntekt': [features.get('inntekt', 'under $11k')],  
+            'kreft': [features.get('kreft', 'no')],  
+            'sykehusdød': [0]  # 
         })
 
         # Automatiser tildeling av sykdomskategori basert på sykdom_underkategori
@@ -64,7 +69,7 @@ def predict():
             'antall_komorbiditeter', 'koma_score', 'fysiologisk_score', 'apache_fysiologisk_score',
             'overlevelsesestimat_2mnd', 'overlevelsesestimat_6mnd',
             'lege_overlevelsesestimat_2mnd', 'lege_overlevelsesestimat_6mnd',
-            'diabetes', 'demens', 'dødsfall'
+            'diabetes', 'demens', 'dødsfall', 'adl_stedfortreder'
         ]
 
         # Legg til numeriske felt i input_data med NaN for tomme felt
@@ -83,7 +88,8 @@ def predict():
         input_df['sykehusdød'] = sykehusdod_prediction
 
         # Forbered data til lengdeprediksjon
-        input_df_prepared, _, _, _ = prepare_data_for_length_prediction(input_df, prediction_mode=True)
+        
+        input_df_prepared, _, _, _ = prepare_data_for_length_prediction(input_df, gjennomsnitt_oppholdslengde, prediction_mode=True)
 
         # Transformer input data ved hjelp av `col_transformer`
         input_data_imputed = col_transformer.transform(input_df_prepared)
