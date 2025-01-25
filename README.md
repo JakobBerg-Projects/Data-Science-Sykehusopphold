@@ -41,7 +41,7 @@ HTML tilhørende nettsiden for predikasjonen.
 
 
 
-**Sykehusdata**
+## Sykehusdata
 
 | Variabelnavn   | Rolle               | Type         | Beskrivelse                                             |
 |----------------|---------------------|--------------|---------------------------------------------------------|
