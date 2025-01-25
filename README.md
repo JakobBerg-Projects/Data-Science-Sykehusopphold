@@ -1,4 +1,10 @@
-# Prosject: Databeskrivelse
+# Data Science prosjekt
+
+Denne oppgaven presenterer en maskinlæringsmodell utviklet for å predikere lengden på
+sykehusopphold for individuelle pasienter. Modellen benytter pasientinformasjon, inkludert
+fysiologiske data, demografiske data og data om sykdomsalvorlighet på tvers av ni ulike
+sykdomskategorier. Målet er å gi nøyaktige anslag på oppholdslengden for nye pasienter
+basert på disse variablene.
 
 ## Data
 Dette datasettet omfatter 8261 individuelt kritisk syke pasienter fra 5 medisinske sentre i USA, registrert i periodene 1989-1991 og 1992-1994.
@@ -11,7 +17,7 @@ Det er 4 datasett (antall pasienter, antall variabler):
 - fysiologiske data (7740, 15)
 - demografiske data (7742, 6)
 
-# Estimering av sykehusopphold Data Science
+# Filstruktur
 
 Prosjektet er delt inn i 3 deler.
 
